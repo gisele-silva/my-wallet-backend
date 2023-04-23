@@ -1,11 +1,12 @@
-import cadastroSchema from "../schemas/user.schema.js"
-import {db} from "../database/database.connection.js"
+import {  cadastroSchema, loginSchema } from "../schemas/user.schema.js"
+import { db } from "../database/database.connection.js"
 import bcrypt from "bcrypt"
+import {v4 as uuid} from "uuid"
 
-export async function signup (req, res){
-    const {nome, email, senha, confirmaSenha} = req.body
+export async function cadastro (req, res){
+    const { nome, email, senha } = req.body
 
-    const validation = cadastroSchema.validate(req.body, {abortEarly: false})
+    const validation = cadastroSchema.validate(req.body, { abortEarly: false })
     if(validation.error){
         const errors = validation.error.map((detail) => detail.message)
         return res.status(422).send(errors)
@@ -17,12 +18,33 @@ export async function signup (req, res){
 
         const hash = bcrypt.hashSync(senha, 10)
         await db.collection.insertOne({nome, email, senha: hash})
+        
         res.sendStatus(200)
     } catch (error) {
-        return res.status(500).send(error)
+        return res.status(500).send(error.message)
     }
 }
 
-export async function signin (req, res){
+export async function login (req, res){
+    const {email, senha} = req.body
     
+    const validation = loginSchema.validate(req.body, { abortEarly: false })
+    if (validation.error) {
+        const errors = validation.error.map((detail) => detail.message)
+        return res.status(422).send(errors)
+    }
+
+    try {
+        const usuario = await db.collection("users").findOne({ email })
+        if(!usuario) return res.status(404).send("Email não cadastrado")
+
+        if (usuario && bcrypt.compareSync(senha, usuario.senha)){
+            const token = uuid()
+            await db.collection("sessao").insertOne({ userId: user._id, token })
+        }
+
+        res.status(200).send(token)
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
 }

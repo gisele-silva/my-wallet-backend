@@ -1,9 +1,7 @@
 import {Router} from "express"
-import receitasRouter from "./receitas.routes.js"
-import usuariosRouter from "./usuarios.routes.js"
+import userRouter from "./user.route.js"
 
 const router = Router()
-router.use(receitasRouter)
-router.use(usuariosRouter) 
+router.use(userRouter)
 
 export default router
