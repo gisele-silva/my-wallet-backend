@@ -1,5 +1,4 @@
 import { db } from "../database/database.connection.js"
-import { transacaoSchema } from "../schemas/transacao.schema.js"
 import dayjs from "dayjs"
 
 export async function operacaoEntradaSaida (req, res) {
@@ -13,7 +12,8 @@ export async function operacaoEntradaSaida (req, res) {
 
     try {
         const { user } = res.locals
-        await db.collection("transacao").insertOne({valor, descricao, tipo, userId: user._id, createAt: dayjs().format("DD/MM")})
+        const sessao = res.locals.sessao
+        await db.collection("transacao").insertOne({valor, descricao, tipo, userId: sessao._id, createAt: dayjs().format("DD/MM")})
         return res.sendStatus(200)
     } catch (error) {
         return res.status(500).send(error.message) 
@@ -24,7 +24,8 @@ export async function mostrarOperacao (req, res) {
    
     try {
         
-        const transacoes = await db.collection("transacoes").find({userId: user._id}).toArray()
+        const sessao = res.locals.sessao
+        const transacoes = await db.collection("transacoes").find({userId: sessao._id}).toArray()
 
         return res.status(200).send(transacoes)
     } catch (error) {
