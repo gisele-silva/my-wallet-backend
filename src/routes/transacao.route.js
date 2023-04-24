@@ -1,9 +1,9 @@
 import { Router } from "express"
-import { login, cadastro } from "../controllers/user.controllers.js";
+import { mostrarOperacao, operacaoEntradaSaida } from "../controllers/transacao.controllers.js";
 
 const transacaoRouter = Router()
 
-transacaoRouter.post("/nova-transacao/:tipo", cadastro)
-transacaoRouter.post("/sign-in", login)
+transacaoRouter.post("/nova-transacao/:tipo", operacaoEntradaSaida)
+transacaoRouter.get("/transacao", mostrarOperacao)
 
 export default transacaoRouter

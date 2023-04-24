@@ -13,11 +13,11 @@ export async function cadastro (req, res){
     }
 
     try {
-        const usuario = await db.collection("users").findOne({email})
+        const usuario = await db.collection("users").findOne({ email })
         if(usuario) return res.status(409).send("Email já cadastrado")
 
         const hash = bcrypt.hashSync(senha, 10)
-        await db.collection.insertOne({nome, email, senha: hash})
+        await db.collection("users").insertOne({ nome, email, senha: hash })
         
         res.sendStatus(200)
     } catch (error) {
@@ -38,10 +38,11 @@ export async function login (req, res){
         const usuario = await db.collection("users").findOne({ email })
         if(!usuario) return res.status(404).send("Email não cadastrado")
 
-        if (usuario && bcrypt.compareSync(senha, usuario.senha)){
-            const token = uuid()
-            await db.collection("sessao").insertOne({ userId: user._id, token })
-        }
+        const comparaSenha = bcrypt.compareSync(senha, usuario.senha)
+        if (!comparaSenha) return res.status(401).send("Senha icorreta")
+
+        const token = uuid()
+        await db.collection("sessao").insertOne({ userId: usuario._id, token })
 
         res.status(200).send(token)
     } catch (error) {
