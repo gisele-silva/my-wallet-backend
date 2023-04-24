@@ -5,11 +5,11 @@ import dayjs from "dayjs"
 export async function operacaoEntradaSaida (req, res) {
     const {valor, descricao, tipo} = req.body
    
-    const validation = transacaoSchema.validate(req.body, { abortEarly: false })
+    /*const validation = transacaoSchema.validate(req.body, { abortEarly: false })
     if(validation.error){
         const errors = validation.error.map((detail) => detail.message)
         return res.status(422).send(errors)
-    }
+    }*/
 
     try {
         const { user } = res.locals
